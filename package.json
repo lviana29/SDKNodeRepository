@@ -1,7 +1,8 @@
 {
   "name": "@lviana29-solution/sdk-node-repository",
   "version": "1.0.0",
-  "description": "SDK de repositórios agnósticos para microserviços",
+  "license": "MIT",
+  "description": "An agnostic, type-safe Database Repository SDK built for Node.js applications",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "type": "commonjs",
@@ -15,7 +16,6 @@
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
   "dependencies": {
     "sequelize": "^6.37.8",
     "sequelize-typescript": "^2.1.6"
