@@ -8,20 +8,17 @@ import { IDataBaseProvider } from "../src/interfaces/database-provider-interface
 import { CustomerModel } from "./sequelize/customer.model";
 async function runDemo() {
   console.log("DB_PROVIDER do env: ", process.env.DB_PROVIDER);
-  // 1. Captura o provider via variável de ambiente (Padrão: sequelize) Catch provider variable by .env file (default value: sequelize).
   const providerType = (
     process.env.DB_PROVIDER || "sequelize"
   ).toLowerCase() as "sequelize" | "prisma";
 
   console.log(
-    `\n🚀 Inicializando ambiente de teste usando o Provider: [${providerType.toUpperCase()}]`,
+    `\n🚀 Initializing environment using provider: [${providerType.toUpperCase()}]`,
   );
 
   let dbProvider: IDataBaseProvider;
 
-  // 2. Conditional initialization for technology infrastructure
-  if (providerType === "prisma") {
-    const dbUser = process.env.DB_USER || "root";
+  const dbUser = process.env.DB_USER || "root";
     const dbPassword =
       process.env.DB_PASSWORD === "''" || process.env.DB_PASSWORD === '""'
         ? ""
@@ -29,6 +26,10 @@ async function runDemo() {
     const dbHost = process.env.DB_HOST || "127.0.0.1";
     const dbPort = process.env.DB_PORT || 3306;
     const dbName = process.env.DB_NAME || "sdk_demo_db";
+
+  // 2. Conditional initialization for technology infrastructure
+  if (providerType === "prisma") {
+    
 
     const connectionUrl =
       process.env.DATABASE_URL ||
@@ -52,11 +53,11 @@ async function runDemo() {
   } else {
     dbProvider = DatabaseFactory.create("sequelize", {
       dialect: "mysql",
-      host: "localhost",
+      host: dbHost,
       port: 3306,
-      username: "root",
-      password: "",
-      database: "sdk_demo_db",
+      username: dbUser,
+      password: dbPassword,
+      database: dbName,
       models: [CustomerModel],
       logging: false,
     });
@@ -87,9 +88,6 @@ async function runDemo() {
     const foundUser = await customerRepo.findById(createdUser.id);
     console.log("🔍 Object have got on database by identifier:", foundUser);
 
-    // =========================================================================
-    // 💥 NOVO TESTE: UTILIZANDO O FINDCUSTOM COM A SUA INTERFACE
-    // =========================================================================
     console.log("\n🧪 Executing custom find using custom types...");
 
     // Here we need build filter rules basead on active ORM
@@ -97,12 +95,12 @@ async function runDemo() {
     const queryOptions =
       providerType === "prisma"
         ? {
-            where: { name: { contains: "Leonardo" } },
-            select: { id: true, name: true }, // Projeção nativa do Prisma
+            where: { name: { contains: "NameUser" } },
+            select: { id: true, name: true },
           }
         : {
-            where: { name: "Leonardo Viana (Via SDK)" },
-            attributes: ["id", "name"], // Projeção nativa do Sequelize
+            where: { name: "NameUser Lastname (Via SDK)" },
+            attributes: ["id", "name"],
           };
 
     // We need call the metod passing it interface CustomerClientModel on Generics<>.
@@ -114,19 +112,18 @@ async function runDemo() {
     console.log("✨ Result of findCustom (Total:", customList.length, "):");
     console.log(customList);
 
-    // Validação de tipagem na IDE (Verifique se ao digitar '.', o autocomplete sugere 'id' e 'name')
     if (customList.length > 0) {
       console.log(
-        `🔒 Acesso tipado seguro na API cliente -> Nome: ${customList[0].name}`,
+        `🔒 Get result model -> Name: ${customList[0].name}`,
       );
     }
     // =========================================================================
   } catch (error) {
-    console.error("❌ Ocorreu um erro na execução da demo:", error);
+    console.error("❌ Failed on execution demo app:", error);
   } finally {
-    // 5. Finaliza a conexão limpamente
+    
     await dbProvider.disconnect();
-    console.log("🔌 Conexão do provider encerrada.\n");
+    console.log("🔌 Connection closed.\n");
   }
 }
 

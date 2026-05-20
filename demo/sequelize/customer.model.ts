@@ -1,4 +1,4 @@
-// demo/sequelize/customer.model.ts
+//Exemple for model using sequelize
 import {
   CreationOptional,
   DataTypes,
