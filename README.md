@@ -1,4 +1,4 @@
-# @lviana29/sdk-node-repository
+# @lviana29-solution/sdk-node-repository
 
 An agnostic, type-safe Database Repository SDK built for Node.js applications. 
 
@@ -21,7 +21,7 @@ Install the SDK along with the ORM/Provider you plan to use in your client appli
 
 ### Install the core SDK
 ```bash
-npm install @lviana29/sdk-node-repository
+npm install @lviana29-solution/sdk-node-repository
 ```
 ### Install Peer Dependencies based on your target setup:
 
@@ -74,7 +74,7 @@ You can alternate between ORMs dynamically using an environment variable or appl
 ```typescript
 import { PrismaClient } from "@prisma/client";
 import { PrismaMariaDb } from "@prisma/adapter-mariadb";
-import { DatabaseFactory, IDataBaseProvider } from "@lviana29/sdk-node-repository";
+import { DatabaseFactory, IDataBaseProvider } from "@lviana29-solution/sdk-node-repository";
 import { CustomerModel } from "./sequelize/customer.model"; // Your native Sequelize model
 
 const providerType = (process.env.DB_PROVIDER || "sequelize").toLowerCase();

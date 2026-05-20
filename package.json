@@ -1,5 +1,5 @@
 {
-  "name": "@lviana29/sdk-node-repository",
+  "name": "@lviana29-solution/sdk-node-repository",
   "version": "1.0.0",
   "description": "SDK de repositórios agnósticos para microserviços",
   "main": "dist/index.js",
