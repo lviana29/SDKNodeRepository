@@ -12,7 +12,7 @@ export class PrismaGenericRepository<
     return this.prismaClient[this.modelName.toLowerCase()];
   }
 
-  async findById(id: string | number): Promise<TEntity | null> {
+  async findById(id: string | number, raw = true): Promise<TEntity | null> {
     const parsedId =
       typeof id === "string" && !isNaN(Number(id)) ? Number(id) : id;
 
@@ -44,6 +44,7 @@ export class PrismaGenericRepository<
   async findCustom<TData = TEntity>(
     queryName: string,
     options?: any,
+    raw = true
   ): Promise<TData[]> {
     const result = await this.dbModel.findMany({
       ...options,

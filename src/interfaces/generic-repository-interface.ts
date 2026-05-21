@@ -1,5 +1,5 @@
 export interface IGenericRepository<TEntity> {
-  findById(id: string | number): Promise<TEntity | null>;
+  findById(id: string | number, raw?: boolean): Promise<TEntity | null>;
   create(data: Partial<TEntity>): Promise<TEntity>;
   update(id: string | number, data: Partial<TEntity>): Promise<TEntity>;
   /**
@@ -11,6 +11,7 @@ export interface IGenericRepository<TEntity> {
   findCustom<TData = TEntity>(
     queryName: string,
     options?: any,
+    raw?: boolean
   ): Promise<TData[]>;
 
   clear(): Promise<void>;
