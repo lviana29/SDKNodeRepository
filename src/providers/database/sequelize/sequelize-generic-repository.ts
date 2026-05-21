@@ -28,7 +28,6 @@ export class SequelizeGenericRepository<
   ): Promise<TData[]> {
     const result = await this.sequelizeModel.findAll({
       ...options,
-      raw: true,
       nest: true,
     });
 
