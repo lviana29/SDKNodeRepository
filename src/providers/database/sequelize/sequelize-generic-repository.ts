@@ -9,7 +9,7 @@ export class SequelizeGenericRepository<
     const record = await this.sequelizeModel.findByPk(id);
     if (!record) return null;
     
-    return raw ? (record.toJSON() as TEntity) : (record as unknown as TEntity);
+    return raw ? (record.get({ plain: true }) as TEntity) : (record as unknown as TEntity);
   }
 
   async create(data: Partial<TEntity>): Promise<TEntity> {
@@ -35,7 +35,7 @@ export class SequelizeGenericRepository<
     });
 
     if (raw) {
-      return result.map((r: any) => r.toJSON()) as TData[];
+      return result.map((r: any) => r.get({ plain: true })) as TData[];
     }
 
     return result as unknown as TData[];
