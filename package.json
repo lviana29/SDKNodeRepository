@@ -1,6 +1,6 @@
 {
   "name": "@lviana29-solution/sdk-node-repository",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "license": "MIT",
   "description": "An agnostic, type-safe Database Repository SDK built for Node.js applications",
   "main": "dist/index.js",

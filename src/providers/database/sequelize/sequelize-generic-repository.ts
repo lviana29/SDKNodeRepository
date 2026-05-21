@@ -5,9 +5,11 @@ export class SequelizeGenericRepository<
 > implements IGenericRepository<TEntity> {
   constructor(private sequelizeModel: any) {}
 
-  async findById(id: string | number): Promise<TEntity | null> {
+  async findById(id: string | number, raw = true): Promise<TEntity | null> {
     const record = await this.sequelizeModel.findByPk(id);
-    return record ? (record.toJSON() as TEntity as TEntity) : null;
+    if (!record) return null;
+    
+    return raw ? (record.toJSON() as TEntity) : (record as unknown as TEntity);
   }
 
   async create(data: Partial<TEntity>): Promise<TEntity> {
@@ -25,11 +27,16 @@ export class SequelizeGenericRepository<
   async findCustom<TData = TEntity>(
     queryName: string,
     options?: any,
+    raw = false,
   ): Promise<TData[]> {
     const result = await this.sequelizeModel.findAll({
       ...options,
       nest: true,
     });
+
+    if (raw) {
+      return result.map((r: any) => r.toJSON()) as TData[];
+    }
 
     return result as unknown as TData[];
   }
