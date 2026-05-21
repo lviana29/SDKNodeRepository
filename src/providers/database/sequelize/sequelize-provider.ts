@@ -14,9 +14,13 @@ export class SequelizeProvider implements IDataBaseProvider {
       for (const model of models) {
         if (typeof model.initialize === "function") {
           model.initialize(this.instance);
-        } else if (typeof model.init === "function") {
-          // Caso contrário, tenta rodar o init nativo do Sequelize
-          // Para o Sequelize puro funcionar aqui com os decorators, ele precisaria do mapeamento básico.
+        } 
+      }
+
+      // associate
+      for (const model of models) {
+        if (typeof model.associate === "function") {
+          model.associate(this.instance.models);
         }
       }
     }
