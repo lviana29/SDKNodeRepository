@@ -16,4 +16,5 @@ export interface IGenericRepository<TEntity> {
 
   clear(): Promise<void>;
   delete(id: string | number): Promise<void>;
+  updateMany(where: object, data: Partial<TEntity>): Promise<number>;
 }
