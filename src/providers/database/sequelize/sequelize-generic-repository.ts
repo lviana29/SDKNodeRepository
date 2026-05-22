@@ -41,6 +41,11 @@ export class SequelizeGenericRepository<
     return result as unknown as TData[];
   }
 
+  async updateMany(where: object, data: Partial<TEntity>): Promise<number> {
+  const [affectedRows] = await this.sequelizeModel.update(data, { where });
+  return affectedRows;
+}
+
   async clear(): Promise<void> {
     await this.sequelizeModel.destroy({ where: {} });
   }

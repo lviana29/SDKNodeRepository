@@ -53,6 +53,15 @@ export class PrismaGenericRepository<
     return result as unknown as TData[];
   }
 
+  async updateMany(where: object, data: Partial<TEntity>): Promise<number> {
+  const result = await this.dbModel.updateMany({
+    where: where,
+    data: data,
+  });
+
+  return result.count;
+}
+
   async clear(): Promise<void> {
     await this.dbModel.deleteMany({});
   }
