@@ -12,15 +12,15 @@ export class SequelizeGenericRepository<
     return raw ? (record.get({ plain: true }) as TEntity) : (record as unknown as TEntity);
   }
 
-  async create(data: Partial<TEntity>): Promise<TEntity> {
-    const record = await this.sequelizeModel.create(data);
+  async create(data: Partial<TEntity>, options?: { transaction?: any }): Promise<TEntity> {
+    const record = await this.sequelizeModel.create(data, { transaction: options?.transaction });
     return record.toJSON() as TEntity;
   }
 
-  async update(id: string | number, data: Partial<TEntity>): Promise<TEntity> {
-    const record = await this.sequelizeModel.findByPk(id);
+  async update(id: string | number, data: Partial<TEntity>, options?: { transaction?: any }): Promise<TEntity> {
+    const record = await this.sequelizeModel.findByPk(id, { transaction: options?.transaction });
     if (!record) throw new Error("Not found");
-    await record.update(data);
+    await record.update(data, { transaction: options?.transaction });
     return record.toJSON() as TEntity;
   }
 
@@ -41,8 +41,11 @@ export class SequelizeGenericRepository<
     return result as unknown as TData[];
   }
 
-  async updateMany(where: object, data: Partial<TEntity>): Promise<number> {
-  const [affectedRows] = await this.sequelizeModel.update(data, { where });
+  async updateMany(where: object, data: Partial<TEntity>, options?: { transaction?: any }): Promise<number> {
+  const [affectedRows] = await this.sequelizeModel.update(data, { 
+    where, 
+    transaction: options?.transaction 
+  });
   return affectedRows;
 }
 

@@ -1,7 +1,7 @@
 export interface IGenericRepository<TEntity> {
   findById(id: string | number, raw?: boolean): Promise<TEntity | null>;
-  create(data: Partial<TEntity>): Promise<TEntity>;
-  update(id: string | number, data: Partial<TEntity>): Promise<TEntity>;
+  create(data: Partial<TEntity>, options?: { transaction?: any }): Promise<TEntity>;
+  update(id: string | number, data: Partial<TEntity>, options?: { transaction?: any }): Promise<TEntity>;
   /**
    * Make a custom search (with joins and etc)
    * @template TData Custom/complex object send for client.
@@ -16,5 +16,5 @@ export interface IGenericRepository<TEntity> {
 
   clear(): Promise<void>;
   delete(id: string | number): Promise<void>;
-  updateMany(where: object, data: Partial<TEntity>): Promise<number>;
+  updateMany(where: object, data: Partial<TEntity>, options?: { transaction?: any }): Promise<number>;
 }

@@ -44,4 +44,10 @@ export class SequelizeProvider implements IDataBaseProvider {
 
     return new SequelizeGenericRepository<TEntity>(model);
   }
+
+  async transaction<T>(work: (t: any) => Promise<T>): Promise<T> {
+    return await this.instance.transaction(async (t) => {
+      return await work(t);
+    });
+  }
 }

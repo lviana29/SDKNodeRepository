@@ -23,21 +23,24 @@ export class PrismaGenericRepository<
     return record as TEntity | null;
   }
 
-  async create(data: Partial<TEntity>): Promise<TEntity> {
-    const record = await this.dbModel.create({
-      data: data,
-    });
+  private getClient(options?: { transaction?: any }) {
+    return options?.transaction || this.prismaClient;
+  }
+
+  async create(data: Partial<TEntity>, options?: { transaction?: any }): Promise<TEntity> {
+    const client = this.getClient(options);
+    const record = await client[this.modelName.toLowerCase()].create({ data });
     return record as TEntity;
   }
 
-  async update(id: string | number, data: Partial<TEntity>): Promise<TEntity> {
+  async update(id: string | number, data: Partial<TEntity>, options?: { transaction?: any }): Promise<TEntity> {
     const parsedId =
       typeof id === "string" && !isNaN(Number(id)) ? Number(id) : id;
-
-    const record = await this.dbModel.update({
-      where: { id: parsedId },
-      data: data,
-    });
+    const client = options?.transaction || this.prismaClient;
+    const record = await client[this.modelName.toLowerCase()].update({
+    where: { id: parsedId },
+    data: data,
+  });
     return record as TEntity;
   }
 
@@ -53,11 +56,12 @@ export class PrismaGenericRepository<
     return result as unknown as TData[];
   }
 
-  async updateMany(where: object, data: Partial<TEntity>): Promise<number> {
-  const result = await this.dbModel.updateMany({
-    where: where,
-    data: data,
-  });
+  async updateMany(where: object, data: Partial<TEntity>, options?: { transaction?: any }): Promise<number> {
+    const client = options?.transaction || this.prismaClient;
+    const result = await client[this.modelName.toLowerCase()].updateMany({
+      where: where,
+      data: data,
+    });
 
   return result.count;
 }

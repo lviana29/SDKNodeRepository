@@ -29,4 +29,10 @@ export class PrismaProvider implements IDataBaseProvider {
     }
     return new PrismaGenericRepository<TEntity>(this.prisma, modelName);
   }
+
+  async transaction<T>(work: (t: any) => Promise<T>): Promise<T> {
+    return await this.prisma.$transaction(async (tx: any) => {
+      return await work(tx);
+    });
+  }
 }
