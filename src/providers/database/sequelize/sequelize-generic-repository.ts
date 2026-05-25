@@ -1,3 +1,4 @@
+import { Model } from "sequelize";
 import { IGenericRepository } from "../../../interfaces/generic-repository-interface";
 
 export class SequelizeGenericRepository<
@@ -42,12 +43,21 @@ export class SequelizeGenericRepository<
   }
 
   async updateMany(where: object, data: Partial<TEntity>, options?: { transaction?: any }): Promise<number> {
-  const [affectedRows] = await this.sequelizeModel.update(data, { 
-    where, 
-    transaction: options?.transaction 
-  });
-  return affectedRows;
-}
+    const [affectedRows] = await this.sequelizeModel.update(data, { 
+      where, 
+      transaction: options?.transaction 
+    });
+    return affectedRows;
+  }
+
+  async createMany(data: Partial<TEntity>[], options?: { transaction?: any }): Promise<TEntity[]> {
+   
+    const records = await this.sequelizeModel.bulkCreate(data, { 
+      transaction: options?.transaction 
+    });
+    
+    return records.map((r: Model) => r.toJSON()) as TEntity[];
+  }
 
   async clear(): Promise<void> {
     await this.sequelizeModel.destroy({ where: {} });
