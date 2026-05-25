@@ -50,6 +50,13 @@ export class SequelizeGenericRepository<
     return affectedRows;
   }
 
+  async deleteMany(where: object, options?: { transaction?: any }): Promise<number> {
+    return await this.sequelizeModel.destroy({
+    where,
+    transaction: options?.transaction
+  });
+  }
+
   async createMany(data: Partial<TEntity>[], options?: { transaction?: any }): Promise<TEntity[]> {
    
     const records = await this.sequelizeModel.bulkCreate(data, { 

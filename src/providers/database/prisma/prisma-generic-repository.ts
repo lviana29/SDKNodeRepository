@@ -63,15 +63,25 @@ export class PrismaGenericRepository<
       data: data,
     });
 
-  return result.count;
+    return result.count;
   }
+
+  async deleteMany(where: any, options?: { transaction?: any }): Promise<number> {
+  const client = options?.transaction || this.prismaClient;
+  const result = await client[this.modelName.toLowerCase()].deleteMany({
+    where,
+    ...(options?.transaction && { })
+  });
+  
+  return result.count;
+}
 
   async createMany(data: Partial<TEntity>[], options?: { transaction?: any }): Promise<number> {
     const client = options?.transaction || this.prismaClient;
     
     const result = await client[this.modelName.toLowerCase()].createMany({
       data: data,
-      skipDuplicates: true, // Opcional: útil para evitar erros de unique constraint
+      skipDuplicates: true,
     });
 
     return result.count;
