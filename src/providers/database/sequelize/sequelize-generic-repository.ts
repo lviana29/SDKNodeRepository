@@ -71,6 +71,6 @@ export class SequelizeGenericRepository<
   }
 
   async delete(id: string | number): Promise<void> {
-    await this.sequelizeModel.delete({ where: { id } });
+    await this.sequelizeModel.destroy({ where: { id } });
   }
 }
