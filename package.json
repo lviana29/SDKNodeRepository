@@ -1,6 +1,6 @@
 {
   "name": "@lviana29-solution/sdk-node-repository",
-  "version": "1.4.1",
+  "version": "1.4.2",
   "license": "MIT",
   "description": "An agnostic, type-safe Database Repository SDK built for Node.js applications",
   "main": "dist/index.js",
@@ -12,13 +12,21 @@
   "scripts": {
     "build": "tsup src/index.ts --format cjs,esm --dts --clean",
     "prisma:generate": "prisma generate --schema=demo/prisma/schema.prisma",
-    "demo": "ts-node --swc -r dotenv/config demo/main.ts"
+    "demo": "ts-node --swc -r dotenv/config demo/main.ts",
+    "audit": "npm audit --omit=dev",
+    "audit-dev": "npm audit"
   },
   "keywords": [],
   "author": "",
   "dependencies": {
     "sequelize": "^6.37.8",
     "sequelize-typescript": "^2.1.6"
+  },
+  "overrides": {
+    "uuid": "^11.1.1",
+    "brace-expansion": "^5.0.8",
+    "minimatch": "^10.0.1",
+    "glob": "^10.5.0"
   },
   "peerDependencies": {
     "@prisma/client": "^7.8.0"
