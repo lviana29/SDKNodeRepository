@@ -1,4 +1,4 @@
-import { col, fn, Model } from "sequelize";
+import { col, fn, literal, Model } from "sequelize";
 import { IGenericRepository } from "../../../interfaces/generic-repository-interface";
 import { AggregateOptionsInterface } from "../../../interfaces/aggregate-options-interface";
 
@@ -7,20 +7,31 @@ export class SequelizeGenericRepository<
 > implements IGenericRepository<TEntity> {
   constructor(private sequelizeModel: any) {}
 
-  async aggregate(options: AggregateOptionsInterface): Promise<Record<string, number>> {
-    const attributes = options.metrics.map((m) => [
-    fn(m.function, col(m.field)),
-    m.alias,
-  ]);
+ async aggregate(options: AggregateOptionsInterface): Promise<Record<string, number>> {
+  const attributes = options.metrics.map((m) => {
+   
+      if (m.function === "TIMESTAMPDIFF_MINUTE") {
+        const [startCol, endCol] = m.field.split(",");
+        return [
+          fn(
+            "AVG",
+            literal(`TIMESTAMPDIFF(MINUTE, ${startCol}, ${endCol})`)
+          ),
+          m.alias,
+        ];
+      }
 
-  const result = await this.sequelizeModel.findOne({
-    attributes,
-    where: options.where,
-    include: options.include,
-    raw: true,
-  });
+      return [fn(m.function, col(m.field)), m.alias];
+    });
 
-  return result || {};
+    const result = await this.sequelizeModel.findOne({
+      attributes,
+      where: options.where,
+      include: options.include,
+      raw: true,
+    });
+
+    return result || {};
   }
 
   async findById(id: string | number, raw = true): Promise<TEntity | null> {
