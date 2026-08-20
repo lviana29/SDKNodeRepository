@@ -5,4 +5,5 @@ export interface IDataBaseProvider {
   disconnect(): Promise<void>;
   getRepository<TEntity>(modelName: string): IGenericRepository<TEntity>;
   transaction<T>(work: (t: any) => Promise<T>): Promise<T>;
+  queryRaw<T = any>(sql: string, replacements?: any): Promise<T>;
 }

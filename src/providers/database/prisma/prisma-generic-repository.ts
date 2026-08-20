@@ -1,3 +1,4 @@
+import { AggregateOptionsInterface } from "../../../interfaces/aggregate-options-interface";
 import { IGenericRepository } from "../../../interfaces/generic-repository-interface";
 
 export class PrismaGenericRepository<
@@ -7,6 +8,37 @@ export class PrismaGenericRepository<
     private prismaClient: any,
     private modelName: string,
   ) {}
+
+  async aggregate(options: AggregateOptionsInterface): Promise<Record<string, number>> {
+    const aggregatePayload: Record<string, any> = {};
+
+    for (const metric of options.metrics) {
+      const prismaFunction = `_${metric.function.toLowerCase()}`; // Ex: '_count', '_avg', '_sum'
+
+      if (!aggregatePayload[prismaFunction]) {
+        aggregatePayload[prismaFunction] = {};
+      }
+
+      aggregatePayload[prismaFunction][metric.field] = true;
+    }
+
+    const result = await this.dbModel.aggregate({
+      where: options.where,
+      ...aggregatePayload,
+    });
+
+    const formattedResult: Record<string, number> = {};
+
+    for (const metric of options.metrics) {
+      const prismaFunction = `_${metric.function.toLowerCase()}`;
+      const rawValue = result[prismaFunction]?.[metric.field];
+
+    
+      formattedResult[metric.alias] = typeof rawValue === "number" ? rawValue : Number(rawValue || 0);
+    }
+
+    return formattedResult;
+  }
 
   private get dbModel() {
     return this.prismaClient[this.modelName.toLowerCase()];

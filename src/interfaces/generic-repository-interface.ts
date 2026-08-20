@@ -1,3 +1,5 @@
+import { AggregateOptionsInterface } from "./aggregate-options-interface";
+
 export interface IGenericRepository<TEntity> {
   findById(id: string | number, raw?: boolean): Promise<TEntity | null>;
   create(data: Partial<TEntity>, options?: { transaction?: any }): Promise<TEntity>;
@@ -19,4 +21,5 @@ export interface IGenericRepository<TEntity> {
   updateMany(where: object, data: Partial<TEntity>, options?: { transaction?: any }): Promise<number>;
   createMany(data: Partial<TEntity>[], options?: { transaction?: any }): Promise<any>;
   deleteMany(where: object, options?: { transaction?: any }): Promise<number>;
+  aggregate(options: AggregateOptionsInterface): Promise<Record<string, number>>;
 }

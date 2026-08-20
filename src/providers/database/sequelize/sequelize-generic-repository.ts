@@ -1,10 +1,27 @@
-import { Model } from "sequelize";
+import { col, fn, Model } from "sequelize";
 import { IGenericRepository } from "../../../interfaces/generic-repository-interface";
+import { AggregateOptionsInterface } from "../../../interfaces/aggregate-options-interface";
 
 export class SequelizeGenericRepository<
   TEntity,
 > implements IGenericRepository<TEntity> {
   constructor(private sequelizeModel: any) {}
+
+  async aggregate(options: AggregateOptionsInterface): Promise<Record<string, number>> {
+    const attributes = options.metrics.map((m) => [
+    fn(m.function, col(m.field)),
+    m.alias,
+  ]);
+
+  const result = await this.sequelizeModel.findOne({
+    attributes,
+    where: options.where,
+    include: options.include,
+    raw: true,
+  });
+
+  return result || {};
+  }
 
   async findById(id: string | number, raw = true): Promise<TEntity | null> {
     const record = await this.sequelizeModel.findByPk(id);

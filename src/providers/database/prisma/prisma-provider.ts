@@ -15,6 +15,11 @@ export class PrismaProvider implements IDataBaseProvider {
     this.prisma = config.clientInstance;
   }
 
+   async queryRaw<T = any>(sql: string, replacements?: any): Promise<T> {
+    const [results] = await this.prisma.query(sql, { replacements });
+    return results as T;
+  }
+
   async connect(): Promise<void> {
     await this.prisma.$connect();
   }

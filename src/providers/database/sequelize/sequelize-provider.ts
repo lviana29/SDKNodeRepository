@@ -25,6 +25,11 @@ export class SequelizeProvider implements IDataBaseProvider {
       }
     }
   }
+  
+   async queryRaw<T = any>(sql: string, replacements?: any): Promise<T> {
+    const [results] = await this.instance.query(sql, { replacements });
+    return results as T;
+  }
 
   async connect(): Promise<void> {
     await this.instance.authenticate();
