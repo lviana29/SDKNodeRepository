@@ -9,17 +9,68 @@ export class PrismaGenericRepository<
     private modelName: string,
   ) {}
 
-  async aggregate(options: AggregateOptionsInterface): Promise<Record<string, number>> {
+  
+
+  async aggregate<TResult = Record<string, any>>(
+    options: AggregateOptionsInterface
+  ): Promise<TResult[]> {
+    
+    if (options.groupBy) {
+      
+      const byFields = Array.isArray(options.groupBy)
+        ? options.groupBy
+        : [options.groupBy];
+
+    
+      const selectAggregates: Record<string, any> = {};
+
+      for (const metric of options.metrics) {
+        if (["COUNT", "SUM", "AVG", "MIN", "MAX"].includes(metric.function)) {
+          const prismaFunc = `_${metric.function.toLowerCase()}`;
+          if (!selectAggregates[prismaFunc]) {
+            selectAggregates[prismaFunc] = {};
+          }
+          selectAggregates[prismaFunc][metric.field] = true;
+        }
+      }
+
+     
+      const groupResults = await this.dbModel.groupBy({
+        by: byFields,
+        where: options.where,
+        ...selectAggregates,
+        ...(options.order && { orderBy: options.order }),
+      });
+
+   
+      return groupResults.map((item: any) => {
+        const formattedItem: Record<string, any> = {};
+
+        for (const field of byFields) {
+          formattedItem[field] = item[field];
+        }
+
+        for (const metric of options.metrics) {
+          const prismaFunc = `_${metric.function.toLowerCase()}`;
+          const rawValue = item[prismaFunc]?.[metric.field];
+          formattedItem[metric.alias] =
+            typeof rawValue === "number" ? rawValue : Number(rawValue || 0);
+        }
+
+        return formattedItem as TResult;
+      });
+    }
+
     const aggregatePayload: Record<string, any> = {};
 
     for (const metric of options.metrics) {
-      const prismaFunction = `_${metric.function.toLowerCase()}`; // Ex: '_count', '_avg', '_sum'
-
-      if (!aggregatePayload[prismaFunction]) {
-        aggregatePayload[prismaFunction] = {};
+      if (["COUNT", "SUM", "AVG", "MIN", "MAX"].includes(metric.function)) {
+        const prismaFunction = `_${metric.function.toLowerCase()}`;
+        if (!aggregatePayload[prismaFunction]) {
+          aggregatePayload[prismaFunction] = {};
+        }
+        aggregatePayload[prismaFunction][metric.field] = true;
       }
-
-      aggregatePayload[prismaFunction][metric.field] = true;
     }
 
     const result = await this.dbModel.aggregate({
@@ -27,17 +78,16 @@ export class PrismaGenericRepository<
       ...aggregatePayload,
     });
 
-    const formattedResult: Record<string, number> = {};
+    const formattedResult: Record<string, any> = {};
 
     for (const metric of options.metrics) {
       const prismaFunction = `_${metric.function.toLowerCase()}`;
       const rawValue = result[prismaFunction]?.[metric.field];
-
-    
-      formattedResult[metric.alias] = typeof rawValue === "number" ? rawValue : Number(rawValue || 0);
+      formattedResult[metric.alias] =
+        typeof rawValue === "number" ? rawValue : Number(rawValue || 0);
     }
 
-    return formattedResult;
+    return [formattedResult as TResult];
   }
 
   private get dbModel() {

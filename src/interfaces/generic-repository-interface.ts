@@ -21,5 +21,7 @@ export interface IGenericRepository<TEntity> {
   updateMany(where: object, data: Partial<TEntity>, options?: { transaction?: any }): Promise<number>;
   createMany(data: Partial<TEntity>[], options?: { transaction?: any }): Promise<any>;
   deleteMany(where: object, options?: { transaction?: any }): Promise<number>;
-  aggregate(options: AggregateOptionsInterface): Promise<Record<string, number>>;
+  aggregate<TResult = Record<string, any>>(
+    options: AggregateOptionsInterface
+  ): Promise<TResult[]>;
 }

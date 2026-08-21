@@ -7,31 +7,48 @@ export class SequelizeGenericRepository<
 > implements IGenericRepository<TEntity> {
   constructor(private sequelizeModel: any) {}
 
- async aggregate(options: AggregateOptionsInterface): Promise<Record<string, number>> {
-  const attributes = options.metrics.map((m) => {
-   
+  async aggregate<TResult = Record<string, any>>(
+    options: AggregateOptionsInterface
+  ): Promise<TResult[]> {
+      const attributes: any[] = options.metrics.map((m) => {
+      
       if (m.function === "TIMESTAMPDIFF_MINUTE") {
         const [startCol, endCol] = m.field.split(",");
         return [
-          fn(
-            "AVG",
-            literal(`TIMESTAMPDIFF(MINUTE, ${startCol}, ${endCol})`)
-          ),
+          fn("AVG", literal(`TIMESTAMPDIFF(MINUTE, ${startCol}, ${endCol})`)),
           m.alias,
         ];
       }
 
-      return [fn(m.function, col(m.field)), m.alias];
-    });
+      if (m.function === "DATE") {
+        return [fn("DATE", col(m.field)), m.alias];
+      }
 
-    const result = await this.sequelizeModel.findOne({
+      if (m.function === "HOUR") {
+          return [fn("HOUR", col(m.field)), m.alias];
+        }
+
+        return [fn(m.function, col(m.field)), m.alias];
+
+      });
+
+    // Mapeia o groupBy para Sequelize literal caso venha uma função SQL
+    const group = options.groupBy
+      ? Array.isArray(options.groupBy)
+        ? options.groupBy.map((g) => literal(g))
+        : [literal(options.groupBy)]
+      : undefined;
+
+    const result = await this.sequelizeModel.findAll({
       attributes,
       where: options.where,
       include: options.include,
+      group,
+      order: options.order,
       raw: true,
     });
 
-    return result || {};
+    return (result || []) as TResult[];
   }
 
   async findById(id: string | number, raw = true): Promise<TEntity | null> {
